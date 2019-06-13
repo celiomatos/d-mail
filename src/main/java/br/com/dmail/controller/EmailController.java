@@ -14,7 +14,12 @@ public class EmailController {
     private EmailService emailService;
 
     @GetMapping("/d-alert")
-    public void sendMessageWithAttachment()  {
+    public void sendDAlertMessage()  {
         emailService.sendDAlert();
+    }
+
+    @GetMapping("/d-payment")
+    public void sendPaymentMessage()  {
+        emailService.sendPayment();
     }
 }
