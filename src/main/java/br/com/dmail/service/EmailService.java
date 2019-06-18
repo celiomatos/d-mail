@@ -15,7 +15,8 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.*;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Service
@@ -81,8 +82,10 @@ public class EmailService {
 
     public void sendPayment() {
 
-        LocalDateTime hoje = LocalDateTime.now();
-        PagamentoSearchDto pagSearchDto = PagamentoSearchDto.builder().dataInicial(new Date()).dataFinal(new Date()).build();
+        LocalDate localDate = LocalDate.now().minusDays(1);
+        Date yesterday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        PagamentoSearchDto pagSearchDto = PagamentoSearchDto.builder().dataInicial(yesterday).dataFinal(yesterday).build();
 
         try {
             MimeMessage message = emailSender.createMimeMessage();
