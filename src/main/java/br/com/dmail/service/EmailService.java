@@ -15,6 +15,7 @@ import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Service
@@ -26,6 +27,9 @@ public class EmailService {
 
     @Autowired
     private PagamentoService pagamentoService;
+
+    @Autowired
+    private DestinatarioService destinatarioService;
 
     public void sendDAlert() {
 
@@ -49,7 +53,7 @@ public class EmailService {
                     log.error(ex.getMessage());
                 }
             }
-            String[] to = {"celiomatos@live.com", "paulosergiopool@gmail.com"};
+            String[] to = destinatarioService.findByGrupo("d-alert");
             sendMessageWithAttachment(to, "msg", text, files);
         }
     }
@@ -76,13 +80,15 @@ public class EmailService {
     }
 
     public void sendPayment() {
+
+        LocalDateTime hoje = LocalDateTime.now();
         PagamentoSearchDto pagSearchDto = PagamentoSearchDto.builder().dataInicial(new Date()).dataFinal(new Date()).build();
 
         try {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            String[] to = {"celiomatos@live.com", "paulosergiopool@gmail.com"};
+            String[] to = destinatarioService.findByGrupo("d-pagamento");
             helper.setTo(to);
             helper.setSubject("Pagamento");
             helper.setText("Pagamentos");
@@ -95,10 +101,8 @@ public class EmailService {
 
 
             emailSender.send(message);
-        } catch (MessagingException ex) {
+        } catch (MessagingException | IOException ex) {
             log.error(ex.getMessage());
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
