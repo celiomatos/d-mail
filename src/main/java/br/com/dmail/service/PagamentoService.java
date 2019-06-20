@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
-@FeignClient(name = "pagamentoService", url = "http://localhost:8084/pagamentos")
+@FeignClient(name = "pagamentoService", url = "http://d-server-main:8084/pagamentos")
 public interface PagamentoService {
 
     @PostMapping("/pagamentos-to-excell")
