@@ -1,7 +1,10 @@
 package br.com.dmail.service;
 
+import br.com.dmail.model.PagamentoSearchDto;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.compress.utils.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -10,11 +13,10 @@ import org.springframework.stereotype.Service;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 
 @Service
@@ -22,7 +24,13 @@ import java.util.Date;
 public class EmailService {
 
     @Autowired
-    public JavaMailSender emailSender;
+    private JavaMailSender emailSender;
+
+    @Autowired
+    private PagamentoService pagamentoService;
+
+    @Autowired
+    private DestinatarioService destinatarioService;
 
     public void sendDAlert() {
 
@@ -46,7 +54,7 @@ public class EmailService {
                     log.error(ex.getMessage());
                 }
             }
-            String[] to = {"celiomatos@live.com", "paulosergiopool@gmail.com"};
+            String[] to = destinatarioService.findByGrupo("d-alert");
             sendMessageWithAttachment(to, "msg", text, files);
         }
     }
@@ -68,6 +76,35 @@ public class EmailService {
 
             emailSender.send(message);
         } catch (MessagingException ex) {
+            log.error(ex.getMessage());
+        }
+    }
+
+    public void sendPayment() {
+
+        LocalDate localDate = LocalDate.now().minusDays(1);
+        Date yesterday = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+
+        PagamentoSearchDto pagSearchDto = PagamentoSearchDto.builder().dataInicial(yesterday).dataFinal(yesterday).build();
+
+        try {
+            MimeMessage message = emailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            String[] to = destinatarioService.findByGrupo("d-pagamento");
+            helper.setTo(to);
+            helper.setSubject("Pagamento");
+            helper.setText("Pagamentos");
+
+            byte[] bytes = pagamentoService.pagamentosToExcell(pagSearchDto);
+            InputStream is = new ByteArrayInputStream(bytes);
+            helper.addAttachment(
+                    "pagamentos.xlsx",
+                    new ByteArrayResource(IOUtils.toByteArray(is)));
+
+
+            emailSender.send(message);
+        } catch (MessagingException | IOException ex) {
             log.error(ex.getMessage());
         }
     }

@@ -95,3 +95,6 @@ buildNumber.properties
 
 # End of https://www.gitignore.io/api/maven,intellij
 /*.log
+
+### Docker ###
+docker/*.war
