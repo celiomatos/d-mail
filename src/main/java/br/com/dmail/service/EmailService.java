@@ -34,7 +34,7 @@ public class EmailService {
 
     public void sendDAlert() {
 
-        File dir = new File("/sistema/d-alert/" + new SimpleDateFormat("yyyy-MM-dd'T'HH").format(new Date()));
+        File dir = new File("capturas/palert/" + new SimpleDateFormat("yyyy-MM-dd'T'HH").format(new Date()));
 
         if (dir.exists()) {
             File files[] = dir.listFiles();
