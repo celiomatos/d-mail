@@ -98,3 +98,4 @@ buildNumber.properties
 
 ### Docker ###
 docker/*.war
+.idea
