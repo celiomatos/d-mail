@@ -4,4 +4,4 @@ ENV TZ=America/Manaus
 RUN apk add tzdata
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 COPY d-mail.war .
-CMD echo "172.18.0.6      d-server-eureka" >> /etc/hosts && java -jar d-mail.war
+CMD java -jar d-mail.war
