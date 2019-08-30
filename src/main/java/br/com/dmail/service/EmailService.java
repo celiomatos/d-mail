@@ -27,10 +27,7 @@ public class EmailService {
     private JavaMailSender emailSender;
 
     @Autowired
-    private PagamentoService pagamentoService;
-
-    @Autowired
-    private DestinatarioService destinatarioService;
+    private MainService mainService;
 
     public void sendDAlert() {
 
@@ -54,7 +51,7 @@ public class EmailService {
                     log.error(ex.getMessage());
                 }
             }
-            String[] to = destinatarioService.findByGrupo("d-alert");
+            String[] to = mainService.findByGrupo("d-alert");
             sendMessageWithAttachment(to, "msg", text, files);
         }
     }
@@ -91,12 +88,12 @@ public class EmailService {
             MimeMessage message = emailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-            String[] to = destinatarioService.findByGrupo("d-pagamento");
+            String[] to = mainService.findByGrupo("d-pagamento");
             helper.setTo(to);
             helper.setSubject("Pagamento");
             helper.setText("Pagamentos");
 
-            byte[] bytes = pagamentoService.pagamentosToExcell(pagSearchDto);
+            byte[] bytes = mainService.pagamentosToExcell(pagSearchDto);
             InputStream is = new ByteArrayInputStream(bytes);
             helper.addAttachment(
                     "pagamentos.xlsx",
